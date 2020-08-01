@@ -1,26 +1,51 @@
 import "reflect-metadata";
 
-import * as Bootstrap from "./@server/Bootstrap";
+// import { DependencyInjection as DI } from "./@agnes/core/DI/DI";
 
-const init = new Bootstrap(); 
+import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
+import { makeExecutableSchema } from "graphql-tools";
+
+// let dependecyInjected = DI.getInstance();
 
 import * as express from "express";
+
 import * as bodyParser from "body-parser";
 
 const app = express();
 
 import { Request, Response } from "express";
 
+const books = [
+  {
+    title: "vova",
+    author: "vokvoia"
+  }
+];
+
+
+const typeDefs = `
+type Query { books: [Book] }, 
+type Book { title : String , author: String}
+`;
+
+const resolvers = {
+  Query: {
+    books: () => books
+  }
+}
+
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers
+});
+
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("*", (req: Request, res: Response) => {
+app.use(`/graphql`, graphqlExpress({ schema }));
 
-  return res.status(200).json({
-    "hello": req.query
-  })
-});
+app.use(`/graphiql`, graphiqlExpress({ endpointURL: '/graphql' }));
 
-// app.listen(PORT, () => console.log(`Server is listening: ${PORT}`));
+app.listen(3000, () => console.log(`Server is listening: ${3000}`));
 
