@@ -8,19 +8,48 @@ const graphql_tools_1 = require("graphql-tools");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const books = [
+const humans = [
     {
-        title: "vova",
-        author: "vokvoia"
+        "name": "Han Solo",
+        "appearsIn": [
+            "NEWHOPE",
+            "EMPIRE",
+            "JEDI"
+        ],
+        "starships": [
+            {
+                "name": "Millenium Falcon"
+            },
+            {
+                "name": "Imperial shuttle"
+            }
+        ]
     }
 ];
 const typeDefs = `
-type Query { books: [Book] }, 
-type Book { title : String , author: String}
+type Query {
+  human(id: ID!) : Human
+}
+type Human {
+  name: String, 
+  appearsIn: [Episode],
+  startships: [Starship]
+} 
+enum Episode {
+  NEWHOPE,
+  EMPIRE,
+  JEDI 
+}
+type Starship {
+  name: String
+}
 `;
 const resolvers = {
     Query: {
-        books: () => books
+        human(obj, args, context, info) {
+            console.log(context);
+            return humans;
+        }
     }
 };
 const schema = graphql_tools_1.makeExecutableSchema({
